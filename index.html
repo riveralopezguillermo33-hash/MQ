@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fff7f5">
+  <meta name="description" content="Una carta de amor digital, hecha con mucho cariño para ti.">
+  <title>Un regalito para ti 💗</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --rose: #c96f83;
+      --rose-dark: #954b60;
+      --rose-light: #f7dce1;
+      --blush: #fff7f5;
+      --cream: #fffdf9;
+      --ink: #59454a;
+      --muted: #8c7478;
+      --gold: #c9a86a;
+      --shadow: 0 18px 55px rgba(135, 76, 91, .12);
+      --serif: "Palatino Linotype", "Book Antiqua", Palatino, Georgia, serif;
+      --sans: "Segoe UI", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-width: 320px;
+      margin: 0;
+      color: var(--ink);
+      font-family: var(--sans);
+      background:
+        radial-gradient(ellipse at 10% 8%, rgba(255, 226, 230, .62), transparent 38rem),
+        radial-gradient(ellipse at 95% 42%, rgba(255, 237, 218, .5), transparent 34rem),
+        var(--blush);
+      overflow-x: hidden;
+    }
+    button { font: inherit; }
+    button:focus-visible { outline: 3px solid #ba7587; outline-offset: 4px; }
+    .page-shell { width: min(100% - 32px, 1060px); margin: 0 auto; }
+    .serif { font-family: var(--serif); }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--rose);
+      font-size: .76rem;
+      font-weight: 700;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before, .eyebrow::after { content: "✦"; color: var(--gold); font-size: .7rem; }
+    .button {
+      display: inline-flex;
+      min-height: 48px;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      padding: 12px 22px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(135deg, #d88396, #bc657b);
+      box-shadow: 0 8px 20px rgba(183, 91, 116, .2);
+      font-weight: 650;
+      cursor: pointer;
+      transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .button:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(183, 91, 116, .27); }
+    .button:active { transform: translateY(0) scale(.98); }
+    .button.secondary {
+      color: var(--rose-dark);
+      border-color: rgba(201, 111, 131, .25);
+      background: rgba(255,255,255,.72);
+      box-shadow: none;
+    }
+    .button.secondary:hover { background: white; box-shadow: 0 8px 20px rgba(183, 91, 116, .1); }
+    .tiny-note { color: var(--muted); font-size: .86rem; line-height: 1.7; }
+
+    .welcome {
+      position: fixed;
+      z-index: 20;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(ellipse at 50% 42%, rgba(255,255,255,.93), rgba(255,247,245,.9) 55%, rgba(250,225,229,.94));
+      transition: opacity .75s ease, visibility .75s ease;
+    }
+    .welcome.is-gone { opacity: 0; visibility: hidden; pointer-events: none; }
+    .welcome-card { width: min(100%, 520px); text-align: center; animation: appear .9s both; }
+    .welcome-card h1 { margin: 25px 0 9px; color: var(--rose-dark); font-size: clamp(1.6rem, 6vw, 2.45rem); font-weight: 500; }
+    .welcome-card .tiny-note { margin: 0 auto 22px; max-width: 340px; }
+    .envelope {
+      position: relative;
+      width: min(70vw, 270px);
+      height: min(48vw, 180px);
+      min-height: 145px;
+      margin: 0 auto;
+      border-radius: 11px;
+      background: linear-gradient(145deg, #f5cbd3, #e9aebc);
+      box-shadow: 0 20px 38px rgba(160, 88, 107, .22);
+      animation: envelopeFloat 3.3s ease-in-out infinite;
+      isolation: isolate;
+    }
+    .envelope::before {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      content: "";
+      clip-path: polygon(0 0, 50% 57%, 100% 0);
+      border-radius: 10px 10px 0 0;
+      background: linear-gradient(145deg, #f8dce1, #edc1cb);
+      transform-origin: top;
+      transition: transform .7s ease, z-index .7s step-end;
+    }
+    .envelope::after {
+      position: absolute;
+      inset: 0;
+      content: "";
+      clip-path: polygon(0 100%, 50% 48%, 100% 100%);
+      border-radius: 0 0 10px 10px;
+      background: linear-gradient(135deg, #e9aab8, #f2c3cc);
+    }
+    .envelope-heart {
+      position: absolute;
+      z-index: 2;
+      top: 43%;
+      left: 50%;
+      color: #fff8f7;
+      font-size: clamp(2.4rem, 10vw, 3.5rem);
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 4px 9px rgba(156, 64, 89, .24));
+      animation: heartbeat 1.5s ease-in-out infinite;
+    }
+    .envelope.open::before { z-index: -1; transform: rotateX(180deg); }
+    .envelope.open .envelope-heart { animation: heartFly .7s ease forwards; }
+    .welcome .button { margin-top: 2px; }
+    .welcome-sparkle { position: absolute; color: var(--gold); animation: twinkle 2s ease-in-out infinite; }
+    .welcome-sparkle.one { top: 12%; left: 16%; }
+    .welcome-sparkle.two { top: 20%; right: 14%; animation-delay: .7s; }
+    .welcome-sparkle.three { bottom: 17%; left: 12%; animation-delay: 1.1s; }
+
+    .music-toggle {
+      position: fixed;
+      z-index: 10;
+      top: max(14px, env(safe-area-inset-top));
+      right: max(14px, env(safe-area-inset-right));
+      display: inline-flex;
+      min-height: 42px;
+      align-items: center;
+      gap: 7px;
+      padding: 9px 14px;
+      border: 1px solid rgba(201,111,131,.2);
+      border-radius: 999px;
+      color: var(--rose-dark);
+      background: rgba(255,255,255,.83);
+      box-shadow: 0 5px 18px rgba(135,76,91,.09);
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+    }
+    .music-toggle[aria-pressed="true"] { color: white; background: var(--rose); }
+
+    .hero {
+      position: relative;
+      display: grid;
+      min-height: min(800px, 100svh);
+      place-items: center;
+      padding: 100px 0 72px;
+      text-align: center;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 770px; }
+    .hero h1 {
+      max-width: 750px;
+      margin: 19px auto 14px;
+      color: var(--rose-dark);
+      font-size: clamp(2.55rem, 8vw, 5.5rem);
+      font-weight: 500;
+      line-height: 1.04;
+      letter-spacing: -.045em;
+    }
+    .hero h1 span { color: var(--rose); }
+    .hero-copy { max-width: 600px; margin: 0 auto 24px; color: #755f64; font-size: clamp(1rem, 2.7vw, 1.16rem); line-height: 1.8; }
+    .hero-dedication { display: block; margin-top: 18px; color: var(--muted); font-family: var(--serif); font-size: 1.05rem; font-style: italic; }
+    .makeup-art {
+      position: relative;
+      width: min(100%, 560px);
+      height: 180px;
+      margin: 33px auto 2px;
+    }
+    .cosmetic { position: absolute; bottom: 7px; display: grid; place-items: center; filter: drop-shadow(0 10px 9px rgba(131, 81, 92, .13)); }
+    .compact {
+      left: 15%; width: 106px; height: 106px; border: 9px solid #d6ad76; border-radius: 50%;
+      background: linear-gradient(145deg, #f5e5cb, #d6ae78); transform: rotate(-12deg);
+    }
+    .compact::before { content:""; width: 68px; height: 68px; border: 2px solid rgba(255,255,255,.8); border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff7ed, #d9b69a); }
+    .compact::after { content:"✧"; position: absolute; color: white; font-size: 2rem; }
+    .lipstick {
+      left: 42%; width: 45px; height: 119px; border-radius: 9px 9px 5px 5px;
+      background: linear-gradient(90deg, #a74860, #d98595 48%, #a74860);
+    }
+    .lipstick::before { position:absolute; bottom:100%; width:30px; height:48px; content:""; border-radius: 16px 16px 4px 4px; background: linear-gradient(90deg, #a53c58, #d46b7e 50%, #9c354f); clip-path: polygon(0 100%, 0 34%, 35% 0, 100% 26%, 100% 100%); }
+    .lipstick::after { position:absolute; bottom:-13px; width:55px; height:15px; content:""; border-radius: 3px 3px 7px 7px; background: #d4b477; }
+    .perfume { right: 18%; width: 79px; height: 101px; border: 2px solid #d9b786; border-radius: 21px 21px 13px 13px; background: linear-gradient(90deg, rgba(241,203,178,.65), rgba(255,244,226,.86), rgba(216,165,131,.5)); }
+    .perfume::before { position:absolute; bottom:100%; width:27px; height:17px; content:""; border-radius:4px 4px 0 0; background: #d4ad72; }
+    .perfume::after { content:"♡"; color: #c58b86; font-size: 2.1rem; }
+    .brush { right: 3%; width: 13px; height: 103px; border-radius: 0 0 10px 10px; background: linear-gradient(90deg,#bc8c68,#e6c295,#a77958); transform: rotate(17deg); }
+    .brush::before { position:absolute; bottom:100%; width:27px; height:39px; content:""; border-radius: 90% 90% 32% 32%; background: linear-gradient(90deg,#b78b7c,#e8c6b2,#c39887); }
+    .floating-flower { position:absolute; color: #d58e9d; font-size: 2rem; animation: flowerSway 4s ease-in-out infinite; }
+    .flower-a { top: 8px; left: 9%; }
+    .flower-b { top: 18px; right: 8%; font-size: 1.4rem; animation-delay: 1s; }
+    .flower-c { top: 36px; left: 34%; color: #d8b779; font-size: 1.25rem; animation-delay: .5s; }
+
+    .section { padding: 86px 0; }
+    .section-heading { max-width: 660px; margin: 0 auto 34px; text-align: center; }
+    .section-heading h2 { margin: 12px 0; color: var(--rose-dark); font-size: clamp(2rem, 5vw, 3rem); font-weight: 500; }
+    .section-heading p { color: var(--muted); line-height: 1.75; }
+    .message-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; }
+    .message-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 100%;
+      padding: 23px 23px 20px;
+      border: 1px solid rgba(204, 155, 161, .22);
+      border-radius: 22px;
+      background: rgba(255,255,255,.76);
+      box-shadow: 0 8px 26px rgba(136, 84, 93, .055);
+      transition: transform .24s ease, box-shadow .24s ease, border-color .24s ease;
+    }
+    .message-card:hover { transform: translateY(-3px); border-color: rgba(201,111,131,.35); box-shadow: var(--shadow); }
+    .card-trigger {
+      display: flex;
+      width: 100%;
+      align-items: center;
+      gap: 14px;
+      padding: 0;
+      border: 0;
+      color: inherit;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+    }
+    .card-icon { display:grid; width: 48px; height: 48px; flex: 0 0 48px; place-items:center; border-radius: 16px; background: #fff0f1; font-size: 1.5rem; }
+    .card-title { flex: 1; color: var(--rose-dark); font-family: var(--serif); font-size: 1.23rem; line-height: 1.28; }
+    .card-chevron { color: var(--rose); font-size: 1.15rem; transition: transform .25s ease; }
+    .message-card.is-open .card-chevron { transform: rotate(180deg); }
+    .card-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .4s ease; }
+    .card-content-inner { overflow: hidden; }
+    .message-card.is-open .card-content { grid-template-rows: 1fr; }
+    .card-message { margin: 17px 0 3px 62px; color: #715d61; font-size: .96rem; line-height: 1.78; }
+    .kiss-options { display:flex; flex-wrap:wrap; gap: 8px; margin-top: 15px; }
+    .kiss-button { padding: 9px 12px; border: 1px solid #f0d1d7; border-radius: 999px; color: var(--rose-dark); background:#fff8f8; cursor:pointer; transition: background .2s, transform .2s; }
+    .kiss-button:hover, .kiss-button.is-selected { background:#f8e3e7; transform:translateY(-1px); }
+    .kiss-response { min-height: 0; margin: 11px 0 2px; color: var(--rose-dark); font-family: var(--serif); font-style: italic; line-height: 1.7; }
+    .kiss-response:empty { display:none; }
+
+    .future-card {
+      position: relative;
+      overflow:hidden;
+      margin-top: 28px;
+      padding: 27px;
+      border: 1px solid rgba(207,174,120,.4);
+      border-radius: 24px;
+      background: linear-gradient(125deg, #fffdfa, #fff5f2 72%, #fbeced);
+      box-shadow: 0 10px 30px rgba(164,127,86,.08);
+    }
+    .future-card::before { position:absolute; right:24px; top:10px; content:"✦  ·  ✧"; color:var(--gold); font-size:1.2rem; letter-spacing:10px; }
+    .future-heart { float:left; margin: 0 17px 5px 0; color:#d4778b; font-size:2.3rem; animation: heartbeat 1.7s ease-in-out infinite; }
+    .future-card h3 { margin: 0 0 8px; color:var(--rose-dark); font-family:var(--serif); font-size:1.4rem; font-weight:500; }
+    .future-card p { margin:0; color:#715d61; line-height:1.78; }
+
+    .last-surprise { padding: 45px 20px 76px; text-align:center; }
+    .big-heart { display:block; margin-bottom:12px; color:#d4778b; font-size:clamp(4.2rem, 15vw, 6.2rem); filter:drop-shadow(0 10px 14px rgba(183,91,116,.16)); animation: heartbeat 1.6s ease-in-out infinite; }
+    .last-surprise h2 { margin: 0 0 21px; color:var(--rose-dark); font-family:var(--serif); font-size:clamp(1.7rem,5vw,2.5rem); font-weight:500; }
+    .footer { padding: 24px 0 max(30px, env(safe-area-inset-bottom)); color:var(--muted); text-align:center; font-family:var(--serif); font-style:italic; }
+
+    .letter-overlay {
+      position:fixed;
+      z-index:30;
+      inset:0;
+      display:grid;
+      overflow:auto;
+      place-items:center;
+      padding: max(22px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+      background:rgba(91,54,65,.48);
+      backdrop-filter:blur(7px);
+      opacity:0;
+      visibility:hidden;
+      transition:opacity .35s ease, visibility .35s ease;
+    }
+    .letter-overlay.is-open { opacity:1; visibility:visible; }
+    .letter {
+      position:relative;
+      width:min(100%, 710px);
+      max-height: min(88svh, 900px);
+      overflow:auto;
+      padding:clamp(25px, 6vw, 55px);
+      border:1px solid rgba(211,178,130,.5);
+      border-radius:21px;
+      background:linear-gradient(160deg,#fffefa,#fff8f6 78%,#fff0f1);
+      box-shadow:0 25px 85px rgba(59,32,40,.28);
+      transform:translateY(18px) scale(.97);
+      transition:transform .45s cubic-bezier(.2,.8,.2,1);
+    }
+    .letter-overlay.is-open .letter { transform:translateY(0) scale(1); }
+    .letter h2 { margin:13px 0 22px; color:var(--rose-dark); font-family:var(--serif); font-size:clamp(1.75rem,5vw,2.5rem); font-weight:500; }
+    .letter-body { color:#695459; font-family:var(--serif); font-size:1.02rem; line-height:1.86; white-space:pre-line; }
+    .letter-signature { margin:20px 0 24px; color:var(--rose-dark); font-family:var(--serif); font-style:italic; }
+    .letter-actions { display:flex; flex-wrap:wrap; gap:10px; }
+    .close-letter { position:absolute; top:14px; right:14px; display:grid; width:40px; height:40px; place-items:center; border:0; border-radius:50%; color:var(--rose-dark); background:#fff0f1; font-size:1.3rem; cursor:pointer; }
+    .hearts-layer { position:fixed; z-index:50; inset:0; overflow:hidden; pointer-events:none; }
+    .burst-heart { position:absolute; bottom:-30px; color:#d7768c; opacity:0; animation:heartRise var(--duration, 3s) ease-out forwards; filter:drop-shadow(0 3px 6px rgba(156,64,89,.15)); }
+    .tap-heart { position:fixed; z-index:55; pointer-events:none; color:#d7768c; font-size:1.3rem; animation:tapPop .9s ease-out forwards; }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+    @keyframes appear { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes envelopeFloat { 50% { transform:translateY(-9px) rotate(.5deg); } }
+    @keyframes heartbeat { 0%,100% { transform:scale(1); } 15% { transform:scale(1.1); } 30% { transform:scale(1); } 45% { transform:scale(1.07); } }
+    @keyframes heartFly { to { opacity:0; transform:translate(-50%,-130%) scale(1.7); } }
+    @keyframes twinkle { 50% { opacity:.35; transform:scale(.78) rotate(20deg); } }
+    @keyframes flowerSway { 50% { transform:translateY(-5px) rotate(9deg); } }
+    @keyframes heartRise { 0% { opacity:0; transform:translateY(0) rotate(0) scale(.55); } 12% { opacity:.92; } 100% { opacity:0; transform:translateY(-110vh) rotate(24deg) scale(1.2); } }
+    @keyframes tapPop { 0% { opacity:0; transform:translate(-50%,-50%) scale(.3); } 20% { opacity:1; } 100% { opacity:0; transform:translate(calc(-50% + var(--drift)), -85px) scale(1.5) rotate(17deg); } }
+
+    @media (max-width: 650px) {
+      .page-shell { width:min(100% - 26px, 540px); }
+      .hero { min-height: 92svh; padding:90px 0 55px; }
+      .makeup-art { height:150px; transform:scale(.9); transform-origin:center top; margin-bottom:-10px; }
+      .compact { left:11%; width:90px; height:90px; }
+      .compact::before { width:56px; height:56px; }
+      .lipstick { left:41%; height:105px; }
+      .perfume { right:16%; width:68px; height:88px; }
+      .brush { right:3%; height:91px; }
+      .message-grid { grid-template-columns:1fr; gap:12px; }
+      .section { padding:64px 0; }
+      .message-card { padding:19px 18px; border-radius:19px; }
+      .card-message { margin-left:0; font-size:.94rem; }
+      .future-card { padding:22px 19px; }
+      .music-toggle { min-height:40px; font-size:.87rem; }
+      .letter-overlay { place-items:start center; }
+      .letter { margin:auto 0; max-height:88svh; }
+      .letter-actions .button { flex:1 1 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior:auto !important; animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <button class="music-toggle" id="musicToggle" type="button" aria-pressed="false" aria-label="Activar música romántica">
+    <span aria-hidden="true">♫</span><span id="musicLabel">Música: apagada</span>
+  </button>
+
+  <div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <span class="welcome-sparkle one" aria-hidden="true">✧</span>
+    <span class="welcome-sparkle two" aria-hidden="true">✦</span>
+    <span class="welcome-sparkle three" aria-hidden="true">✧</span>
+    <div class="welcome-card">
+      <div class="envelope" id="envelope" aria-hidden="true"><span class="envelope-heart">♥</span></div>
+      <h1 class="serif" id="welcomeTitle">💌 Tengo una sorpresita para ti, <span data-her>mi amor</span>…</h1>
+      <p class="tiny-note">Preparé este rinconcito con mucho cariño, solo para ti.</p>
+      <button class="button" id="openGift" type="button">💗 Abrir mi regalito</button>
+    </div>
+  </div>
+
+  <main>
+    <header class="hero page-shell" id="inicio">
+      <div class="hero-content">
+        <span class="eyebrow">Una carta hecha con amor</span>
+        <h1 class="serif">Feliz Día del Maquillaje,<br><span>mi amor hermosa</span> 💄🌷</h1>
+        <p class="hero-copy">Preparé algo especial para ti, porque tu sonrisa es uno de mis lugares favoritos en el mundo. ❤️</p>
+        <button class="button" id="discoverButton" type="button">Descubrir mi sorpresa ✨</button>
+        <span class="hero-dedication">Para mi niña preciosa, con todo mi cariño.</span>
+        <div class="makeup-art" aria-label="Ilustración de maquillaje" role="img">
+          <span class="floating-flower flower-a" aria-hidden="true">✿</span>
+          <span class="floating-flower flower-b" aria-hidden="true">✾</span>
+          <span class="floating-flower flower-c" aria-hidden="true">✧</span>
+          <span class="cosmetic compact" aria-hidden="true"></span>
+          <span class="cosmetic lipstick" aria-hidden="true"></span>
+          <span class="cosmetic perfume" aria-hidden="true"></span>
+          <span class="cosmetic brush" aria-hidden="true"></span>
+        </div>
+      </div>
+    </header>
+
+    <section class="section page-shell" id="sorpresas" aria-labelledby="surprisesTitle">
+      <div class="section-heading">
+        <span class="eyebrow">Pequeñas cosas que quiero decirte</span>
+        <h2 class="serif" id="surprisesTitle">Un detalle a la vez, mi vida 💗</h2>
+        <p>Toca cada tarjetita para abrir un mensajito. Hay mucho amor escondido en cada una.</p>
+      </div>
+      <div class="message-grid">
+        <article class="message-card" data-card>
+          <button class="card-trigger" type="button" aria-expanded="false">
+            <span class="card-icon" aria-hidden="true">💗</span><span class="card-title">¿Sabes qué es lo más bonito de ti?</span><span class="card-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="card-content"><div class="card-content-inner"><p class="card-message">Amor, lo más bonito de ti no está solamente en tu carita preciosa, sino también en tu corazón, en tu ternura, en tu sonrisa y en esa manera tan especial que tienes de hacerme feliz. El maquillaje puede resaltar tu belleza, pero tu esencia es lo que te hace inolvidable para mí. 🥹❤️</p></div></div>
+        </article>
+
+        <article class="message-card" data-card>
+          <button class="card-trigger" type="button" aria-expanded="false">
+            <span class="card-icon" aria-hidden="true">💄</span><span class="card-title">Un mensajito para tu belleza</span><span class="card-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="card-content"><div class="card-content-inner"><p class="card-message">Mi amor, me encanta que puedas expresarte con los colores, las sombras y los labiales que tanto te gustan. Quiero que cada vez que te mires al espejo recuerdes que eres una mujer preciosa, valiosa y capaz de lograr todo lo que sueñas. Con maquillaje o sin él, para mí siempre serás hermosa. 💋🌸</p></div></div>
+        </article>
+
+        <article class="message-card" data-card>
+          <button class="card-trigger" type="button" aria-expanded="false">
+            <span class="card-icon" aria-hidden="true">🥹</span><span class="card-title">Lo que veo cuando te miro</span><span class="card-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="card-content"><div class="card-content-inner"><p class="card-message">Cuando te miro, amor, no veo solamente un rostro hermoso. Veo a la persona que quiero abrazar cuando tenga un día difícil, a quien quiero hacer sonreír cuando esté triste y a esa personita con la que deseo compartir muchísimos momentos bonitos. Eres una parte muy especial de mi vida. ❤️‍🩹🫂</p></div></div>
+        </article>
+
+        <article class="message-card" data-card>
+          <button class="card-trigger" type="button" aria-expanded="false">
+            <span class="card-icon" aria-hidden="true">😘</span><span class="card-title">Elige tu besito</span><span class="card-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="card-content"><div class="card-content-inner">
+            <div class="card-message">
+              <p>Escoge el cariñito que te mando ahora mismo:</p>
+              <div class="kiss-options">
+                <button class="kiss-button" type="button" data-kiss="forehead">😘 Besito en la frente</button>
+                <button class="kiss-button" type="button" data-kiss="lips">💋 Besito en los labios</button>
+                <button class="kiss-button" type="button" data-kiss="hug">🥹 Abrazo que no termina</button>
+              </div>
+              <p class="kiss-response" id="kissResponse" aria-live="polite"></p>
+            </div>
+          </div></div>
+        </article>
+
+        <article class="message-card" data-card>
+          <button class="card-trigger" type="button" aria-expanded="false">
+            <span class="card-icon" aria-hidden="true">🌹</span><span class="card-title">Una promesa para ti</span><span class="card-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div class="card-content"><div class="card-content-inner"><p class="card-message">Mi amor, no quiero que solamente te sientas hermosa hoy. Quiero que todos los días recuerdes cuánto vales, que nunca dejes de creer en ti y que siempre tengas presente que mereces amor bonito, respeto, tranquilidad y felicidad. Quiero acompañarte, apoyarte y celebrar cada uno de tus logros. ❤️🌷</p></div></div>
+        </article>
+      </div>
+
+      <article class="future-card">
+        <span class="future-heart" aria-hidden="true">♥</span>
+        <h3>💍 Un pedacito de nuestro futuro</h3>
+        <p>Si pudiera pedirle algo bonito a la vida, sería que nos permita seguir creando recuerdos, cumplir nuestros sueños y compartir muchos días felices. No sé qué nos traerá el futuro, mi amor, pero me hace ilusión imaginar todos esos momentos bonitos que todavía podemos vivir juntos. 🥹❤️✨</p>
+      </article>
+    </section>
+
+    <section class="last-surprise page-shell" aria-labelledby="lastTitle">
+      <span class="big-heart" aria-hidden="true">♥</span>
+      <h2 class="serif" id="lastTitle">💗 Tengo una última cosita para ti…</h2>
+      <button class="button" id="lastMessageButton" type="button">Descubrir mi último mensaje 💌</button>
+    </section>
+  </main>
+
+  <footer class="footer">Hecho con muchísimo amor, para ti, mi niña preciosa. 🌷</footer>
+
+  <div class="letter-overlay" id="letterOverlay" role="dialog" aria-modal="true" aria-labelledby="letterTitle" aria-hidden="true">
+    <article class="letter">
+      <button class="close-letter" id="closeLetter" type="button" aria-label="Cerrar la carta">×</button>
+      <span class="eyebrow">Una última cosita para ti</span>
+      <h2 id="letterTitle">Para la dueña de mi corazón 💌</h2>
+      <div class="letter-body" id="letterBody"></div>
+      <p class="letter-signature" id="signature"></p>
+      <div class="letter-actions">
+        <button class="button secondary" id="readAgain" type="button">Volver a leer mi regalito 💗</button>
+        <button class="button secondary" id="backToMenu" type="button">Volver al menú de sorpresas 🌷</button>
+        <button class="button" id="sendHearts" type="button">Enviar muchos corazoncitos ❤️</button>
+      </div>
+    </article>
+  </div>
+  <div class="hearts-layer" id="heartsLayer" aria-hidden="true"></div>
+  <div class="sr-only" id="statusMessage" aria-live="polite"></div>
+
+  <script>
+    // Personaliza estos dos valores: deja nombreEnamorada vacío para usar "mi amor".
+    const PERSONALIZACION = {
+      nombreEnamorada: "",
+      tuNombre: ""
+    };
+
+    const nombre = PERSONALIZACION.nombreEnamorada.trim();
+    if (nombre) {
+      document.querySelectorAll("[data-her]").forEach((el) => { el.textContent = nombre; });
+    }
+
+    const welcome = document.getElementById("welcome");
+    const envelope = document.getElementById("envelope");
+    const openGift = document.getElementById("openGift");
+    const mainContent = document.querySelector("main");
+    const letterOverlay = document.getElementById("letterOverlay");
+    const heartsLayer = document.getElementById("heartsLayer");
+    const statusMessage = document.getElementById("statusMessage");
+    const letterBodyText = `Mi amor hermoso, feliz Día del Maquillaje. 💄🌸❤️
+
+Hoy quería regalarte algo diferente, algo que pudieras abrir y leer con una sonrisa. Quizás no sea un regalo que puedas guardar en una cajita, pero sí uno que preparé pensando en ti y en lo especial que eres para mí.
+
+Quiero que nunca olvides que no necesitas maquillaje para ser preciosa, ni la aprobación de nadie para reconocer lo mucho que vales. El maquillaje puede ser una forma hermosa de expresarte, pero tu sonrisa, tu personalidad y tu corazón tienen una belleza que va mucho más allá de cualquier espejo.
+
+Ojalá pudiera estar a tu lado para darte un abrazo, llenarte de besitos y decirte personalmente cuánto te amo. Mientras tanto, quiero que esta pequeña página te recuerde que hay alguien que piensa en ti con muchísimo cariño y que desea verte feliz.
+
+Sigue siendo esa mujer hermosa, soñadora y especial que eres. Nunca dejes de hacer las cosas que te gustan, de cuidar de ti misma y de perseguir tus sueños.
+
+Feliz Día del Maquillaje, mi vida. 💄🎀💗
+
+Con muchísimo amor, para la dueña de una parte muy bonita de mi corazón.
+
+Te amo, amor. ❤️‍🩹🌹`;
+    document.getElementById("letterBody").textContent = letterBodyText;
+    document.getElementById("signature").textContent = PERSONALIZACION.tuNombre.trim()
+      ? `Con todo mi amor,\n${PERSONALIZACION.tuNombre.trim()} ❤️`
+      : "Con todo mi amor,\n[Tu firma] ❤️";
+    document.body.style.overflow = "hidden";
+
+    function makeHearts(amount, center = false) {
+      const symbols = ["♥", "♡", "✦", "✧", "🌸"];
+      for (let i = 0; i < amount; i += 1) {
+        const heart = document.createElement("span");
+        heart.className = "burst-heart";
+        heart.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+        heart.style.left = `${center ? 34 + Math.random() * 32 : Math.random() * 100}%`;
+        heart.style.fontSize = `${14 + Math.random() * 19}px`;
+        heart.style.setProperty("--duration", `${2.1 + Math.random() * 2.3}s`);
+        heartsLayer.appendChild(heart);
+        window.setTimeout(() => heart.remove(), 4700);
+      }
+    }
+
+    openGift.addEventListener("click", () => {
+      envelope.classList.add("open");
+      openGift.disabled = true;
+      makeHearts(34, true);
+      window.setTimeout(() => {
+        welcome.classList.add("is-gone");
+        mainContent.inert = false;
+        document.body.style.overflow = "";
+        document.getElementById("discoverButton").focus({ preventScroll: true });
+        statusMessage.textContent = "Tu regalito está listo. Feliz Día del Maquillaje.";
+      }, 620);
+    });
+    mainContent.inert = true;
+
+    document.getElementById("discoverButton").addEventListener("click", () => {
+      document.getElementById("sorpresas").scrollIntoView({ behavior: "smooth" });
+      makeHearts(12, true);
+    });
+
+    document.querySelectorAll("[data-card] .card-trigger").forEach((trigger) => {
+      trigger.addEventListener("click", () => {
+        const card = trigger.closest("[data-card]");
+        const willOpen = !card.classList.contains("is-open");
+        card.classList.toggle("is-open", willOpen);
+        trigger.setAttribute("aria-expanded", String(willOpen));
+        if (willOpen) makeHearts(8, true);
+      });
+    });
+
+    const kisses = {
+      forehead: "Te dejo un besito suave en la frente, mi amor, para que recuerdes lo mucho que te cuido. 😘💗",
+      lips: "Un besito lleno de amor para esos labios que me encanta ver sonreír. 💋❤️",
+      hug: "Ven aquí, mi amor. 🫂❤️ Imagina que te abrazo muy fuerte, te acaricio el cabello y no te suelto hasta que sientas todo el amor que tengo para darte."
+    };
+    document.querySelectorAll("[data-kiss]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        document.querySelectorAll("[data-kiss]").forEach((item) => item.classList.toggle("is-selected", item === button));
+        document.getElementById("kissResponse").textContent = kisses[button.dataset.kiss];
+        makeHearts(14, true);
+      });
+    });
+
+    function openLetter() {
+      letterOverlay.classList.add("is-open");
+      letterOverlay.setAttribute("aria-hidden", "false");
+      mainContent.inert = true;
+      document.body.style.overflow = "hidden";
+      makeHearts(54, true);
+      window.setTimeout(() => document.getElementById("closeLetter").focus(), 120);
+    }
+    function closeLetter() {
+      letterOverlay.classList.remove("is-open");
+      letterOverlay.setAttribute("aria-hidden", "true");
+      mainContent.inert = false;
+      document.body.style.overflow = "";
+      document.getElementById("lastMessageButton").focus({ preventScroll: true });
+    }
+    document.getElementById("lastMessageButton").addEventListener("click", openLetter);
+    document.getElementById("closeLetter").addEventListener("click", closeLetter);
+    document.getElementById("readAgain").addEventListener("click", () => {
+      closeLetter();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      welcome.classList.remove("is-gone");
+      mainContent.inert = true;
+      document.body.style.overflow = "hidden";
+      envelope.classList.remove("open");
+      openGift.disabled = false;
+      openGift.focus({ preventScroll: true });
+    });
+    document.getElementById("backToMenu").addEventListener("click", () => {
+      closeLetter();
+      document.getElementById("sorpresas").scrollIntoView({ behavior: "smooth" });
+      document.querySelector("#sorpresas .card-trigger").focus({ preventScroll: true });
+    });
+    letterOverlay.addEventListener("click", (event) => {
+      if (event.target === letterOverlay) closeLetter();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && letterOverlay.classList.contains("is-open")) closeLetter();
+    });
+    document.getElementById("sendHearts").addEventListener("click", () => makeHearts(100, true));
+
+    document.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button")) return;
+      const heart = document.createElement("span");
+      heart.className = "tap-heart";
+      heart.textContent = Math.random() > .25 ? "♥" : "✧";
+      heart.style.left = `${event.clientX}px`;
+      heart.style.top = `${event.clientY}px`;
+      heart.style.setProperty("--drift", `${Math.round((Math.random() - .5) * 55)}px`);
+      document.body.appendChild(heart);
+      window.setTimeout(() => heart.remove(), 950);
+    });
+
+    let audioContext;
+    let melodyTimer;
+    let noteIndex = 0;
+    const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880, 698.46, 523.25, 659.25, 783.99, 1046.5];
+    const musicToggle = document.getElementById("musicToggle");
+    const musicLabel = document.getElementById("musicLabel");
+
+    function playNote(frequency) {
+      if (!audioContext || audioContext.state !== "running") return;
+      const now = audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const gain = audioContext.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(frequency, now);
+      gain.gain.setValueAtTime(.0001, now);
+      gain.gain.exponentialRampToValueAtTime(.035, now + .08);
+      gain.gain.exponentialRampToValueAtTime(.0001, now + .75);
+      oscillator.connect(gain);
+      gain.connect(audioContext.destination);
+      oscillator.start(now);
+      oscillator.stop(now + .8);
+    }
+    async function toggleMusic() {
+      if (melodyTimer) {
+        window.clearInterval(melodyTimer);
+        melodyTimer = undefined;
+        if (audioContext) await audioContext.suspend();
+        musicToggle.setAttribute("aria-pressed", "false");
+        musicToggle.setAttribute("aria-label", "Activar música romántica");
+        musicLabel.textContent = "Música: apagada";
+        return;
+      }
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        statusMessage.textContent = "La música no está disponible en este navegador.";
+        return;
+      }
+      try {
+        audioContext = audioContext || new AudioContextClass();
+        await audioContext.resume();
+        playNote(melody[noteIndex % melody.length]);
+        noteIndex += 1;
+        melodyTimer = window.setInterval(() => {
+          playNote(melody[noteIndex % melody.length]);
+          noteIndex += 1;
+        }, 520);
+        musicToggle.setAttribute("aria-pressed", "true");
+        musicToggle.setAttribute("aria-label", "Pausar música romántica");
+        musicLabel.textContent = "Música: encendida";
+      } catch (error) {
+        statusMessage.textContent = "No se pudo iniciar la música. Puedes volver a intentarlo.";
+      }
+    }
+    musicToggle.addEventListener("click", toggleMusic);
+  </script>
+</body>
+</html>
